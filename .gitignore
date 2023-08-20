@@ -1,1 +1,8 @@
+# Build artifacts
 /target
+
+# Editor files
+.vscode/
+
+# macOS
+.DS_Store

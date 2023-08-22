@@ -30,17 +30,19 @@ variables. The following table lists the available configuration options:
 | `--audience`          | `OAUTH2_AUDIENCE`      | OAuth2 audience                  |
 | `--header-name`       | `OAUTH2_HEADER_NAME`   | OAuth2 access token header name  |
 | `--header-value`      | `OAUTH2_HEADER_VALUE`  | OAuth2 access token header value |
-| `--certificate`       | `TLS_CERTIFICATE`      | TLS certificate contents         |
+| `--cert`              | `TLS_CERT`             | TLS certificate contents         |
+| `--cert-file`         | `TLS_CERT_FILE`        | TLS certificate filepath         |
 | `--key`               | `TLS_KEY`              | TLS key contents                 |
+| `--key-file`          | `TLS_KEY_FILE`         | TLS key filepath                 |
 
 A few different forms of authentication are supported. The following table lists the
 supported authentication methods and the required configuration options:
 
-| Method | Required                                              | Optional                                  |
-| ------ | ----------------------------------------------------- | ----------------------------------------- |
-| None   |                                                       |                                           |
-| OAuth2 | `client-id`, `client-secret`, `auth-url`, `token-url` | `audience`, `header-name`, `header-value` |
-| TLS    | `tls-cert`, `tls-key`                                 |                                           |
+| Method | Required                                                 | Optional                                  |
+| ------ | -------------------------------------------------------- | ----------------------------------------- |
+| None   |                                                          |                                           |
+| OAuth2 | `client-id`, `client-secret`, `auth-url`, `token-url`    | `audience`, `header-name`, `header-value` |
+| TLS    | `tls-cert`, `tls-key` OR `tls-cert-file`, `tls-key-file` |                                           |
 
 Exactly one authentication method must be configured. You must always specify
 the `--metrics-endpoint` option, which is the URL of the Prometheus metrics

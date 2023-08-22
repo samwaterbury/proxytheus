@@ -1,10 +1,18 @@
-use anyhow::Result;
-use reqwest::Request;
+use reqwest::tls::Identity;
 
 /// Arguments for TLS client certificate authentication.
 pub struct TlsOptions {
     pub cert: String,
     pub key: String,
+}
+
+impl TlsOptions {
+    pub fn from_files(cert_file: String, key_file: String) -> Self {
+        Self {
+            cert: std::fs::read_to_string(cert_file).expect("Failed to read certificate file."),
+            key: std::fs::read_to_string(key_file).expect("Failed to read key file."),
+        }
+    }
 }
 
 pub struct TlsState {
@@ -19,17 +27,10 @@ impl TlsState {
             key: args.key,
         }
     }
-}
 
-/// Authorize a request by adding the TLS client certificate and key.
-pub fn authorize_request(request: &mut Request, state: &TlsState) -> Result<()> {
-    request.headers_mut().insert(
-        "X-Forwarded-Client-Cert",
-        state.cert.clone().parse().unwrap(),
-    );
-    request
-        .headers_mut()
-        .insert("X-Forwarded-Client-Key", state.key.clone().parse().unwrap());
-
-    Ok(())
+    pub fn identity(&self) -> Identity {
+        let cert = self.cert.as_bytes();
+        let key = self.key.as_bytes();
+        Identity::from_pkcs8_pem(cert, key).expect("Failed to load TLS identity.")
+    }
 }

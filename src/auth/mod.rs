@@ -43,9 +43,7 @@ pub async fn authorize_request(request: &mut Request, auth: &mut AuthMechanism) 
         AuthMechanism::OAuthClientCredentials(state) => {
             oauth::authorize_request(request, state).await?;
         }
-        AuthMechanism::Tls(state) => {
-            tls::authorize_request(request, state)?;
-        }
+        AuthMechanism::Tls(_) => (),
     }
 
     Ok(())

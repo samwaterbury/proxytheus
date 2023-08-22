@@ -8,7 +8,7 @@ use reqwest::{
     Request,
 };
 use time::OffsetDateTime;
-use tracing::debug;
+use tracing::{debug, error, info};
 
 /// Arguments for OAuth client credentials flow authentication.
 pub struct OAuthClientCredentialsOptions {
@@ -68,13 +68,39 @@ impl OAuthClientCredentialsState {
             Some(TokenUrl::new(self.token_url.clone())?),
         );
 
-        // Exchange the client credentials for a token
+        // Construct the request to generate a token
         let mut token_request = client.exchange_client_credentials();
         if Some(self.audience.clone()) != None {
             token_request =
                 token_request.add_extra_param("audience", self.audience.clone().unwrap());
         }
-        let token_result = token_request.request(http_client)?;
+
+        // Exchange the client credentials for a token and log things very
+        // carefully so issues can be debugged efficiently.
+        let token_result = match token_request.request(http_client) {
+            Ok(token_result) => {
+                info!("Token generated successfully.");
+                Ok(token_result)
+            }
+            Err(e) => {
+                error!("Error generating token: {:?}", e);
+                match &e {
+                    oauth2::RequestTokenError::ServerResponse(e) => {
+                        error!("Server response: {:?}", e)
+                    }
+                    oauth2::RequestTokenError::Request(e) => {
+                        error!("Request error: {:?}", e)
+                    }
+                    oauth2::RequestTokenError::Parse(e, ..) => {
+                        error!("Failed to parse server response: {:?}", e)
+                    }
+                    oauth2::RequestTokenError::Other(e) => {
+                        error!("Other error: {:?}", e)
+                    }
+                }
+                Err(e)
+            }
+        }?;
 
         // If no expiry is set, default to 1 hour from now
         let expires_in = token_result

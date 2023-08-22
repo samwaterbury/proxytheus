@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# Include source code
+!src/
+!Cargo.toml
+!Cargo.lock

@@ -62,8 +62,8 @@ the server listens on `0.0.0.0:3000` by default.
 > If you don't do _at least_ one of these things, you are effectively allowing
 > anyone to access your Prometheus metrics without restriction.
 
-Proxytheus is available as a Docker image at `samwaterbury/proxytheus`. The
-docker image can be run with:
+Proxytheus is available as a Docker image at [`samwaterbury/proxytheus`](https://hub.docker.com/r/samwaterbury/proxytheus).
+The docker image can be run with:
 
 ```sh
 docker run -p 3000:3000 samwaterbury/proxytheus:latest --endpoint <endpoint>
@@ -72,3 +72,18 @@ docker run -p 3000:3000 samwaterbury/proxytheus:latest --endpoint <endpoint>
 It was primarily designed to be deployed as a lightweight Kubernetes pod, but in
 principle it should be possible to deploy it anywhere that Docker is supported.
 You can also manually run the `proxytheus` binary if you prefer.
+
+### Building
+
+You can build the `proxytheus` binary with:
+
+```sh
+cargo build --release
+```
+
+It will be located at `target/release/proxytheus`. You can also build the Docker
+image with:
+
+```sh
+docker build . --tag proxytheus:latest
+```

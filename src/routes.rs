@@ -85,10 +85,19 @@ pub async fn metrics(
 
     // Send the request and mirror the response
     match http_client.execute(request).await {
-        Ok(response) => Ok(Response::builder()
-            .status(response.status())
-            .body(Body::from(response.bytes().await.unwrap()))
-            .unwrap()),
+        Ok(response) => {
+            let mut builder = Response::builder().status(response.status());
+            for (key, value) in response.headers().iter() {
+                if key == "transfer-encoding" || key == "content-length" {
+                    continue;
+                }
+                builder = builder.header(key, value);
+            }
+
+            Ok(builder
+                .body(Body::from(response.bytes().await.unwrap()))
+                .unwrap())
+        }
         Err(e) => {
             error!("Error sending request: {}", e);
             Err(StatusCode::INTERNAL_SERVER_ERROR)
